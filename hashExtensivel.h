@@ -214,14 +214,15 @@ if(newCount== 0){
       size_t found;
           
       int i=0;
-   while(getline(arquivo2, line) && i < pow(2,pg)){
+      //Atualiza indices, PLs, e respectivos endereços
+      while(getline(arquivo2, line) && i < pow(2,pg)){
            found = line.find("PG");
            if(found != string::npos){
              arquivo3<<"PG:"<<pgAtualizada<<endl;                                                
            }       
 
            if(i == aux1){           
-             cout<<"Posicao atual do ponteiro: "<<arquivo3.tellp()<<endl;           
+                       
              arquivo3<<to_string(aux1)<<":"<<to_string(this->pl[aux1])<<":"<<this->hash[aux1]<<endl;                      
            } 
            else{
@@ -231,7 +232,7 @@ if(newCount== 0){
       }    
       arquivo2.close();
        arquivo3.close();
-
+     
      ofstream ofile(diretorio+"indice.txt", ios::app);
 
      string filename;
@@ -241,6 +242,7 @@ if(newCount== 0){
      ifstream iline;
      ofstream ofile1;
      // em cada posição do índice:
+     cout<<"teste1"<<endl;
      for(int i=pgAtualizada+1; i<total; i++)  {
          
          if(i == aux2){
@@ -249,20 +251,33 @@ if(newCount== 0){
             ofile2.open(diretorio+"bucket/"+to_string(i)+".txt");
            // ofile1.open(diretorio+"bucket/"+to_string(aux1)+".txt", ios::in);
             iline.open(diretorio+"bucket/"+to_string(aux1)+".txt");
+            
             string line;
-            string deletedLine;
+            string lines[3];
             int count  = 0;
-
+            int y = 0;
+            
             while(getline(iline, line)){
                count++;
-               if(count==3){
-                ofile2<<line<<endl;
-                
-                cout<<"Linha a ser deletada: "<<deletedLine<<endl;
-                
+               lines[y] = line;
+               if(count==3){ 
+                ofile2<<line<<endl;                          
+       
                }
+               y++;
+               }
+
+              ofile2.close();
+              iline.close();
+              ofile1.close();
+
+              ofstream ofile5(diretorio+"bucket/"+to_string(aux1)+".txt");
+              for(int i=0; i<2; i++){
+                ofile5<<lines[i]<<endl;
+              }
                
-            }
+            ofile.close();
+
          }
          else {
            aux3 = funcaoHash(pg, i);

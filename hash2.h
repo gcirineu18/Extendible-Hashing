@@ -1,5 +1,5 @@
-#ifndef hash2
-#define hash2
+#ifndef hashExtensivel
+#define hashExtensivel
 #include <iostream>
 #include <string>
 #include <stack>
@@ -150,7 +150,7 @@ if(newCount== 0){
           if(bucketCheio(ano)){
              
           }
-          arquivo7.open(hash[i]);
+          arquivo7.open(hash[i], ios::app);
          
           for(int j=0; j< newCount;j++){
             arquivo7 << lines[j]<<endl;
@@ -177,7 +177,7 @@ if(newCount== 0){
        }
       return false;
     }
-
+//****************************************************************************
     void duplicaDiretorio(int pg, int ano){
      
       int pgAtualizada = pg+1;
@@ -239,6 +239,7 @@ if(newCount== 0){
      // Escrevendo os respectivos endereços dos para os buckets
      ofstream ofile2;
      ifstream iline;
+     ofstream ofile1;
      // em cada posição do índice:
      for(int i=pgAtualizada+1; i<total; i++)  {
          
@@ -246,12 +247,21 @@ if(newCount== 0){
             filename=diretorio+"bucket/"+to_string(i)+".txt";
             this->pl[i] = pgAtualizada;
             ofile2.open(diretorio+"bucket/"+to_string(i)+".txt");
+           // ofile1.open(diretorio+"bucket/"+to_string(aux1)+".txt", ios::in);
             iline.open(diretorio+"bucket/"+to_string(aux1)+".txt");
             string line;
+            string deletedLine;
+            int count  = 0;
 
             while(getline(iline, line)){
-             //  iline.seekg(-1,ios_base::end);
-               cout<<"Ultima linha deste arquivo: "<<line<<endl;
+               count++;
+               if(count==3){
+                ofile2<<line<<endl;
+                
+                cout<<"Linha a ser deletada: "<<deletedLine<<endl;
+                
+               }
+               
             }
          }
          else {
@@ -273,6 +283,7 @@ if(newCount== 0){
   //Processo para dividir os registros entre os buckets:
     }
 
+  
 /*
 void buscaHash(int ano, int profundidade){
     cout<<"FUNCAO BUSCA"<<endl;
@@ -294,9 +305,14 @@ void buscaHash(int ano, int profundidade){
     }
 
     arq1.close();
-
   }  
 
+
+
+      found = 
+      if(found != string::npos){
+        arquivo3<<"PG:"<<pgAtualizada<<endl;                                                
+      }
 */
 };
 
