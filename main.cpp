@@ -55,7 +55,7 @@ int main(){
       }
     else if(com == "REM"){ 
       
-      //removeHash(ano);
+      obj.removeHash(ano);
       }
     else if(com == "BUS"){ 
       
