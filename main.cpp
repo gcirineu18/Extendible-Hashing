@@ -65,7 +65,7 @@ int main(){
       obj.insereHash(pg, ano);
       }
     else if(com == "REM"){ 
-      
+
       obj.removeHash(ano);
       }
 
