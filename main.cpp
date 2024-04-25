@@ -5,38 +5,74 @@
 #include <vector>
 #include <fstream>
 #include <stdio.h>
+
+#include <stack>
+#include <math.h>
+#include <typeinfo>
+
 using namespace std;
 
 int main(){
-  
   HashExtensivel obj;
-  int aux = obj.funcaoHash(4,1998);
-  int aux2 = obj.funcaoHashAlternativa(3,1998);
+  
+  ifstream arq1("D:/banco_tabalho1_sgbd/in.txt"); 
 
-//  cout<<"O indice com funcao hash aplicada eh: "<<aux<<endl;
- // cout<<"O indice com funcao hash alternativa aplicada eh: "<<aux2<<endl;
-
-
-  ifstream arq("D:/banco_tabalho1_sgbd/in.txt"); //p ler o arquivo
- 
-  if(!arq.is_open()){ //tratamento caso nao seja possivel ler o arquivo
+  if(!arq1.is_open()){ 
     cout<<"Erro ao abrir arquivo!\n"<<endl;
-    //return -1;
+    return -1;
   }
 
-  // string line;
-  // while(getline(arq, line)){ //getline: pega uma linha do arq e coloca em line
-  //   cout<<line<<endl;        //imprime cada linha
-  // }
 
-  arq.close();
+  string prim_linha; 
+  getline(arq1, prim_linha); 
+  prim_linha.erase(0,3); 
+  int pg = stoi(prim_linha); 
+  //cout<<pg<<endl;
 
-  obj.criaHash(2);
- obj.insereHash(2,2013);
- // obj.insereHash(2,1992);
-  //obj.buscaHash(2013, 2);
-  obj.duplicaDiretorio(2,2013);
+  obj.criaHash(pg); 
+  arq1.clear();
+  arq1.seekg(0);
+
+  string line1;
+  string com;
+  string anostr;
+  int ano;
+  while(getline(arq1, line1)){ 
+   
+    com = line1.substr(0,3);
+      
+     if(com != "INC" && com !=  "REM" && com != "BUS"){
+        cout<<"Testando 4234"<<endl;
+      continue;
+    }
+    else{
+    anostr = line1.substr(4,4);
+    ano = stoi(anostr);
+     
+    if(com == "INC"){ 
+
+      obj.insereHash(pg,ano);
+      }
+    else if(com == "REM"){ 
+      
+      //removeHash(ano);
+      }
+    else if(com == "BUS"){ 
+      
+      obj.buscaHash(ano);
+      }
+    
+    }
+ 
+    }
+
+
+  arq1.close();
+
+  //ofstream arq2;
+  //arq2.open(diretorio+"out.txt");
+
+
   return 0;
 }
-
-
+//--------------------------------------------------------------------------------
