@@ -32,7 +32,8 @@ int main(){
   arq.close();
 
   obj.criaHash(2);
-  obj.insereHash(2,2013);
+  obj.insereHash(2,2024);
+  obj.insereHash(2,1992);
   //obj.buscaHash(2013, 2);
   obj.duplicaDiretorio(2,2013);
   return 0;
