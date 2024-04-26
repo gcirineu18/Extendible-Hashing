@@ -47,7 +47,6 @@ int main(){
 
   arq_out << "PG: "<< pg; //primeira linha do arquivo out.txt
 
-
   while(getline(arq_in, line1)){ 
    
     com = line1.substr(0,3);
@@ -66,18 +65,18 @@ int main(){
       }
     else if(com == "REM"){ 
 
-      obj.removeHash(ano);
+     // obj.removeHash(ano);
       }
 
     else if(com == "BUS"){
       obj.buscaHash(ano);
       }
     }
-  
+  }
 
   arq_in.close();
   arq_out.close();
   return 0;
-}
+
 }
 //--------------------------------------------------------------------------------
