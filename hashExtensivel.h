@@ -501,76 +501,8 @@ void buscaHash(int ano){
       printf("BUS:%d/<%d>\n",ano,count);
 
 }
-/*
-void removeHash(int ano){
 
 
-     int indiceAno= funcaoHash(this->pgOriginal, ano); 
-       int pl = this->pl[indiceAno];
-       int pgOriginal = this->pgOriginal;
-       
-       ifstream ifile;
-       ofstream ofile;
-       string filename;
-       
-       string line;
-       string lines[3];
-       int count = 0;
-       bool found = false; 
-       int j=0;
-
-      
-        for(int i = pgOriginal; i <= pl; i++){
-       
-          filename=diretorio+"bucket/"+to_string(indiceAno)+".txt";
-          ifile.open(filename);
-
-          while(getline(ifile,line)){
-             
-            if(line.find(to_string(ano)) != string::npos ){              
-               count++;
-               found=true;
-            } 
-          }
-            if(found == true){
-                 ifile.clear();
-                 ifile.seekg(0);
-                 while(getline(ifile,line)){
-                   lines[j] = line;
-                   j++;
-                 }
-                 ofile.open(filename);
-                 for(int j = 0; j<3; j++){
-                   if(lines[j].find(to_string(ano)) != string::npos){
-                    continue;
-                   }else{
-                    ofile <<lines[j];
-                   }                  
-                 }
-
-                 if(getSizeFile(filename) == 0){
-                   remove(filename.c_str());
-                  
-                   int newHashFun = funcaoHash(this->pl[indiceAno], ano);
-                   this->hash[indiceAno] = this->hash[newHashFun];
-                   for(int k = pgOriginal; k <= pl; k++){
-                    funcaoHash(k,ano);
-                    this->pl[k] = this->pl[k] - 1;
-                                
-                 }
-                 ofile.close();
-            }
-            indiceAno+=4;
-            j++;       
-           
-           ifile.close();
-            }
-     }
-    printf("REM:%d/<%d>,<%d>,<%d>\n",ano,count,this->pg, this->pl[indiceAno]);
-  }
-*/
-  
-  
   void removeHash(int ano){
      int indiceAno= funcaoHash(this->pgOriginal, ano); 
        int pl = this->pl[indiceAno];
