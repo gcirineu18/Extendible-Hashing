@@ -8,12 +8,11 @@
 #include <stack>
 #include <math.h>
 #include <typeinfo>
-
+#include <sstream>
 using namespace std;
 
 int main(){
   HashExtensivel obj;
-  
   ifstream arq_in("D:/banco_tabalho1_sgbd/in.txt"); //abrindo arquivo in.txt
 
   if(!arq_in.is_open()){ 
@@ -27,8 +26,9 @@ int main(){
   prim_linha.erase(0,3); 
   int pg = stoi(prim_linha); 
 
-
   obj.criaHash(pg); //criando a hash
+  obj.Apagabuckets();
+  
   arq_in.clear();
   arq_in.seekg(0);
 
@@ -44,18 +44,15 @@ int main(){
       cout << "Erro ao abrir arquivo de saída!" << endl;
       return -1;
   }
-
   arq_out << "PG: "<< pg; //primeira linha do arquivo out.txt
 
   while(getline(arq_in, line1)){ 
    
-    com = line1.substr(0,3);
-      
+    com = line1.substr(0,3);   
     if(com != "INC" && com !=  "REM" && com != "BUS"){
       cout<<"Testando 4234"<<endl;
       continue;
     }
-
     else{
       ano_str = line1.substr(4,4);
       ano = stoi(ano_str);
@@ -75,7 +72,8 @@ int main(){
 
   arq_in.close();
   arq_out.close();
+  
   return 0;
 
 }
-//--------------------------------------------------------------------------------
+
