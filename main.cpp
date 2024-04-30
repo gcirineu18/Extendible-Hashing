@@ -72,7 +72,6 @@ int main(){
 
   arq_in.close();
   arq_out.close();
-  
   return 0;
 
 }
