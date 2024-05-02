@@ -1,5 +1,5 @@
-#ifndef hash2
-#define hash2
+#ifndef hashExtensivel
+#define hashExtensivel
 #include <iostream>
 #include <string>
 #include <stack>
@@ -8,6 +8,7 @@
 #include <vector>
 #include <sstream>
 #include <typeinfo>
+#include <cstdio>
 using namespace std;
 
 
@@ -38,7 +39,7 @@ public:
       
       arquivo1.open(diretorio+"indice.txt");
       if(arquivo1){
-        cout << " ************Arquivo ja existente, apagando os dados...************" <<endl;
+       // cout << " ************Arquivo ja existente, apagando os dados...************" <<endl;
         ofstream arquivo1(diretorio+"indice.txt", ios::trunc);
         arquivo1.close();
       }
@@ -120,14 +121,15 @@ if(newCount== 0){
    int total = pow(2,this->pg);
    string filename = diretorio+"bucket/"+to_string(indiceAtual)+".txt";
    
-
-   if(bucketCheio(ano) ) {
-    
+   
+   if(bucketCheio(ano, newCount) ) {
+   // printf("O ano %d entrou?\n", ano);
     duplicaDiretorio(this->pg, ano,lines,newCount, false);  
    }
    else{
-   
+    
     if(getSizeFile(filename) +  newCount <=3){
+      
        ofstream arquivo7;                 
       arquivo7.open(this->hash[indiceAtual], ios::app); 
       
@@ -138,37 +140,42 @@ if(newCount== 0){
      arquivo7.close();     
     }
     else{
+    
      int funcao_hash;
     for(int k=this->pgOriginal; k<=this->pg; k++){
-         funcao_hash  = funcaoHash(k, ano);
-        
-      if(this->pg > this->pgOriginal){         
-       if(funcao_hash != funcaoHash(this->pgOriginal, ano)){     
+      funcao_hash  = funcaoHash(k, ano);
+    
+      if(this->pg > this->pgOriginal){ 
+             
+       if(funcao_hash != funcaoHash(this->pgOriginal, ano)){ 
+             
         if(this->hash[funcao_hash] == this->hash[funcaoHash(this->pgOriginal, ano)]){
-          
-
+       
           string nomef = diretorio+"bucket/"+to_string(funcao_hash)+".txt";                          
           string nomef2 = diretorio+"bucket/"+to_string(funcaoHash(k-1, ano))+".txt";
           ifstream ifile(nomef2); 
-         
+           
           string line;
           string linhas1[3];                         
           this->hash[funcao_hash] = nomef;
           //Aumentando a PL
           int funcao_hash_original;
-          int aux;
-          for(int w=this->pgOriginal; w<=this->pg; w++){
-            if(aux!=funcao_hash_original) this->pl[funcao_hash_original]++;
+          int aux = -1;
+          int original = funcaoHash(this->pgOriginal, ano);
+          this->pl[original]++;
+
+          for(int w=this->pgOriginal+1; w<=this->pg; w++){
+            funcao_hash_original = funcaoHash(w, ano);
+            if(aux!=funcao_hash_original) this->pl[funcao_hash_original] =  this->pl[original];
+         
             aux = funcao_hash_original;
             
-            funcao_hash_original = funcaoHash(w, ano);
           }
           int count = 0 ;               
           while(getline(ifile, line)){                
-              linhas1[count] = line;
-                                          
-              count++;
-               
+              linhas1[count] = line;  
+                                                    
+              count++;              
           }
           ofstream ofile;
           // Limpando os dados do arquivo nomef2;
@@ -197,19 +204,18 @@ if(newCount== 0){
             ofile2 <<linhas1[j]<<endl;  
             ofile2.close(); 
    }  
-  
 
            if( getSizeFile(nomef) + newCount > 3){
              
-             if(this->pl[newFunHash] == this->pg){               
-               duplicaDiretorio(this->pg, ano, lines,newCount, false );
-               
+             if(this->pl[newFunHash] == this->pg){  
+              //printf("O ano %d entrou?\n", ano);             
+               duplicaDiretorio(this->pg, ano, lines,newCount, false );              
              }
              else{
                continue;
              }
            }else{
-             ofile.open(nomef);
+             ofile.open(nomef,ios::app);
           for(int d = 0; d< newCount; d++){
              ofile << lines[d]<<endl;
           } 
@@ -218,8 +224,7 @@ if(newCount== 0){
          
           break;
         }        
-   }
-        
+   }       
 }
      
  }   
@@ -243,17 +248,18 @@ printf("INC:%d/<%d>,<%d>\n", ano, this->pg, this->pl[funcaoHash(this->pgOriginal
       Verificar antes todos os buckets associados ao indice
       do ano estão cheios
       */
-   bool bucketCheio(int ano){
+bool bucketCheio(int ano, int newCount){
     bool ehsim = false;
     int idx1 = funcaoHash(this->pgOriginal,ano);
     int aux;
-    if(this->pl[idx1] == this->pg){
+       
+    if(this->pl[idx1] == this->pg){ 
       
        for(int j = this->pl[idx1] ; j<=this->pg;j++){
         aux = funcaoHash(j,ano);
-          
+
         if (getSizeFile(this->hash[aux]) == 3){ 
-         //  printf("pl %d, ano: %d\n", this->pl[idx1], ano);            
+                     
           for(int k = this->pl[idx1]; k<=this->pg;k++){ 
             if(k == j){        
               
@@ -268,9 +274,18 @@ printf("INC:%d/<%d>,<%d>\n", ano, this->pg, this->pl[funcaoHash(this->pgOriginal
           }
         }
         else{
+          string filename = diretorio+"bucket/"+to_string(idx1)+".txt"; 
+         if((newCount + getSizeFile(filename)) > 3){
+         // printf("pl %d, ano: %d, pg: %d\n", this->pl[idx1], ano, this->pg);
+          ehsim = true;
 
-          ehsim = false;
+         }
+         else{
+         ehsim = false;
           break;
+         }
+          
+          
         }        
        }
 
@@ -286,7 +301,7 @@ printf("INC:%d/<%d>,<%d>\n", ano, this->pg, this->pl[funcaoHash(this->pgOriginal
     }
    } 
 //****************************************************************************
-    void duplicaDiretorio(int pg, int ano, string* linhas, int numberOfLines, bool sofreuRecursao){
+void duplicaDiretorio(int pg, int ano, string* linhas, int numberOfLines, bool sofreuRecursao){
      
       int pgAtualizada = pg+1;
       
@@ -310,13 +325,15 @@ printf("INC:%d/<%d>,<%d>\n", ano, this->pg, this->pl[funcaoHash(this->pgOriginal
     
     for(int i = totalRegistrosAnterior; i<total;i++){
       int funcao_hash = funcaoHash(this->pgOriginal,i);  
-      this->pl[i] = this->pl[funcao_hash];
+      this->pl[i] = this->pgOriginal;
       this->hash[i] = "null";
     }
     int salva = -1;
-    for(int k =this->pgOriginal; k <= this->pg; k++ ){   
+    int funcOriginal =  funcaoHash(this->pgOriginal,ano); 
+    this->pl[funcOriginal] +=1;
+    for(int k =this->pgOriginal+1; k <= this->pg; k++ ){   
       funcao_Hash = funcaoHash(k, ano);
-      if(salva!=funcao_Hash) this->pl[funcao_Hash] += 1; 
+      if(salva!=funcao_Hash) this->pl[funcao_Hash] =  this->pl[funcOriginal]; 
        
       salva = funcao_Hash;
     }
@@ -355,7 +372,7 @@ printf("INC:%d/<%d>,<%d>\n", ano, this->pg, this->pl[funcaoHash(this->pgOriginal
     
      for(int i=0; i<total; i++)  {       
            if(i == funcao_hash){  
-            filename=diretorio+"bucket/"+to_string(i)+".txt"; 
+           filename=diretorio+"bucket/"+to_string(i)+".txt"; 
                 
             this->hash[i] = filename;
             ifile2.open(filename);
@@ -367,7 +384,7 @@ printf("INC:%d/<%d>,<%d>\n", ano, this->pg, this->pl[funcaoHash(this->pgOriginal
               string zeile;
               int x=0;
               int auxiliar = 0;
-
+           
               while(getline(ifile2, zeile)){                           
                zeilen[x] = zeile;                           
                x++;
@@ -387,7 +404,10 @@ printf("INC:%d/<%d>,<%d>\n", ano, this->pg, this->pl[funcaoHash(this->pgOriginal
                     verificador = true;
                  }
                  ofile2.open(diretorio+"bucket/"+to_string(newFunHash)+".txt",ios::app); 
-                 ofile2 <<zeilen[p]<<endl;  
+                 string filename8 =diretorio+"bucket/"+to_string(newFunHash)+".txt";
+               //  cout<<"escreveu algo? "<<zeilen[p]<<endl;
+                 ofile2 <<zeilen[p]<<endl; 
+                
                  ofile2.close(); 
                  
                }
@@ -398,20 +418,24 @@ printf("INC:%d/<%d>,<%d>\n", ano, this->pg, this->pl[funcaoHash(this->pgOriginal
             }else{
               ofile2.open(filename);
             }
-              
-       
-            string filename3 = diretorio+"bucket/"+to_string(funcao_hash_anterior)+".txt";
-              
+            
+             int pl =this->pl[funcaoHash(this->pgOriginal,ano)];
+             string lines[50];
+             int count  = 0;
+            int y = 0;
+
+         for(int v = this->pgOriginal; v<pl; v++ ){
+           int funcao_hash_anterior2 = funcaoHash(v,ano);
+            string filename3 = diretorio+"bucket/"+to_string(funcao_hash_anterior2)+".txt";
+            //printf("funcao hash anterior,%d, filename %s\n",funcao_hash_anterior,  filename3.c_str());
             iline.open(filename3);              
             string line;
-            string lines[3];
-            int count  = 0;
-            int y = 0;
-            //Escrevendo o ultimo registro do bucket anterior no novo bucket
-          
-            while(getline(iline, line)){ 
+            
+            
+             while(getline(iline, line)){ 
                count++;
-               lines[y] = line;                           
+               lines[y] = line;  
+              // printf("linhas, %s\n", lines[y].c_str());                         
                y++;
                }
                
@@ -419,37 +443,45 @@ printf("INC:%d/<%d>,<%d>\n", ano, this->pg, this->pl[funcaoHash(this->pgOriginal
               iline.close();
            
               // Esvazia todas as linhas do bucket anterior
-              ofile2.open(diretorio+"bucket/"+to_string(funcao_hash_anterior)+".txt",ios::out);
+              ofile2.open(diretorio+"bucket/"+to_string(funcao_hash_anterior2)+".txt",ios::out);
               ofile2.close();
-        
+       
+           }
+          
               int newAno;
               int newFunHash;
               int funOriginal;
-             
-              // Rescreve as linhas do bucket anterior para o atual                        
+               // Rescreve as linhas do bucket anterior para o atual   
+
               for(int j = 0; j<count; j++){ 
                  newAno = getAnoDaLinha(lines[j]);
                  funOriginal = funcaoHash(this->pgOriginal,newAno);
                  newFunHash = funcaoHash(this->pl[funOriginal],newAno);                
                   this->pl[newFunHash] = this->pl[funOriginal];
-                                           
+                                    
                  this->hash[newFunHash] = diretorio+"bucket/"+to_string(newFunHash)+".txt";
                  ofile2.open(diretorio+"bucket/"+to_string(newFunHash)+".txt",ios::app); 
+                 string filename9 =  diretorio+"bucket/"+to_string(newFunHash)+".txt";
+                
                  ofile2 <<lines[j]<<endl;  
                  ofile2.close(); 
                   
-              }
-               
-         //escrevendo os dados no arquivo duplicado:
+              }     
+           
+             //caso o novo arquivo esteja cheio, é necessario fazer a recursao :
+          
               ofstream ofile3;
               string filename2 = diretorio+"bucket/"+to_string(i)+".txt";
-              ofile3.open(filename2,ios::app); 
+              ofile3.open(filename2,ios::app);
+               
               if((numberOfLines + getSizeFile(filename2)) >3){
                 ofile3.close(); 
                filename2 = diretorio+"bucket/"+to_string(funcao_hash_anterior)+".txt";
                ofile3.open(filename2); 
-               for(int j = 0; j<3; j++){
+               for(int j = 0; j<count; j++){
+                
                    ofile3<<lines[j]<<endl;
+                  
                } 
                printf("DUP_DIR:/<%d>,<%d>\n",this->pg, this->pl[funcao_hash]);              
                duplicaDiretorio(this->pg,ano,linhas,numberOfLines, true);
@@ -460,6 +492,7 @@ printf("INC:%d/<%d>,<%d>\n", ano, this->pg, this->pl[funcaoHash(this->pgOriginal
                 
                 for(int y = 0; y<numberOfLines; y++){
                   ofile3 << linhas[y] << endl;
+                  
                 }
               }
               ofile3.close();                             
@@ -480,7 +513,7 @@ printf("INC:%d/<%d>,<%d>\n", ano, this->pg, this->pl[funcaoHash(this->pgOriginal
     
     }
 
-    void Apagabuckets(){
+void Apagabuckets(){
       string filename;
       ifstream ifile;    
       for (int i = 0; i<32; i++){
@@ -489,7 +522,7 @@ printf("INC:%d/<%d>,<%d>\n", ano, this->pg, this->pl[funcaoHash(this->pgOriginal
       } 
     }
   
-  void imprimeDiretorio(){
+void imprimeDiretorio(){
     string filename = (diretorio+"indice.txt");
     ofstream ofile(filename);
     int total = pow(2,this->pg);
@@ -560,19 +593,177 @@ void buscaHash(int ano){
         arqtemp.close();
       }
     }
-  
-    remove(filename.c_str());
-    rename(auxFileName.c_str(), filename.c_str());
-    cout<<"OPA: "<<filename<<"Indice atual: "<<indiceAtual<<", "<<count<<endl;
-     if(getSizeFile(filename) == 0 && indiceAtual!= indiceAno ){
-        remove(filename.c_str());
-        this->hash[indiceAtual] = this->hash[funcaoHash((this->pg - 1), ano)];
-
-        
-     }
-
+    ifile.close();
+   arqtemp.close();
+   remove(filename.c_str());
+   rename(auxFileName.c_str(), filename.c_str());
+    
+    AcoplaBuckets(ano);             
+    imprimeDiretorio();
+    
     printf("REM:%d/<%d>,<%d>,<%d>\n",ano,count,this->pg, this->pl[indiceAno]);
+  } 
+  
+  void diminuiHash( int indiceAtual){
+      
+      int total = pow(2,this->pg);
+      int total_anterior = pow(2,this->pg-1);
+      bool check = false;
+      for ( int i = total_anterior; i < total; i++) {
+       
+        if(indiceAtual != i){
+          if(this->pl[i] == this->pl[indiceAtual]){
+          
+          check= true;
+        }            
+      }
+        }         
+          if(check ==false){
+            this->pg--;
+         
+             int *newpl = new int[total_anterior];
+             string *newHash = new string[total_anterior];
+         
+            for(int i=0; i<pow(2,this->pg); i++){ 
+            //  
+              newpl[i] = this->pl[i];
+              newHash[i] = this->hash[i];
+            } 
+             
+            delete[] this->pl;
+            this->pl = newpl; 
+            delete[] this->hash;
+            this->hash = newHash;
+          }
   }
+
+  void AcoplaBuckets(int ano){
+    int total = pow(2,this->pg) - 1;
+    int limite = pow(2,this->pgOriginal);
+    string filename1, filename2;
+    int i = total;
+    int totalAux = total;
+    int indicei, pl, indiceAtual;
+
+    int indiceOriginal = funcaoHash(this->pgOriginal, ano);
+    int plOriginal = this->pl[indiceOriginal];
+     while( i>=limite){
+       indicei= funcaoHash(this->pgOriginal, i); 
+       pl = this->pl[indicei];
+      
+      int weisNicht = (pow(2,pl-1)); 
+       pgOriginal = this->pgOriginal;
+       indiceAtual = funcaoHash(pl,i);
+       for(int j = plOriginal ; j>= this->pgOriginal; j--){
+        int newindex = funcaoHash(j, ano);
+       // 
+        if(i == newindex){
+         
+         if(i >=weisNicht){  
+        
+          if(this->pl[i]>this->pgOriginal){
+         
+        int aux;
+        int idx = i;
+        //Processo de acoplamento -> verifica se é possível acoplar.
+        for(int j = this->pl[i]; j>pgOriginal; j--){          
+           idx = funcaoHash(j, idx);  
+            if(idx!=aux){
+              
+               filename1 = diretorio+"bucket/"+to_string(idx)+".txt";
+               int plaux = this->pl[idx];
+               int idx2 = funcaoHash(j-1,idx);
+               filename2 = diretorio+"bucket/"+to_string(idx2)+".txt";
+               ifstream ifile1, ifile2;
+               ofstream ofile1, ofile2;
+               ifile2.open(filename2);
+               ifile1.open(filename1);
+               string zeile;
+               string zeilen[3];
+               if(!ifile2.is_open()){
+              
+                ofile2.open(filename2);
+                ofile2.close();
+               }
+               
+               int count = 0;             
+               int weisNicht2 = (pow(2,this->pl[indiceOriginal]-1));          
+             //  printf("indice %d, limit %d, filename1 %s, filename2 %s\n", idx, weisNicht2, filename1.c_str(), filename2.c_str());
+               if(idx >= weisNicht2 && getSizeFile(filename1) + getSizeFile(filename2) <=3){
+                               
+                while(getline(ifile1, zeile)){
+                 zeilen[count] = zeile;
+                 count++;
+                }
+                ifile1.close();
+                remove(filename1.c_str());
+                this->hash[idx] = this->hash[indiceOriginal];
+                ofile1.open(filename2, ios::app);
+                for(int t =0; t<count; t++){
+                  ofile1 << zeilen[t]<<endl;
+                }
+            
+            diminuiHash(idx);     
+            int indiceAux, aux2 = -1;
+            int newBool = false;
+            indiceAux = funcaoHash(this->pgOriginal,idx);
+            int plAux = this->pl[indiceOriginal];
+
+            int totalDeBucketsAtual = pow(2,(this->pl[indiceOriginal] - this->pgOriginal));
+            int limit =pow(2, plAux-1);
+
+          //  printf("totalDeBucketsAtual %d, plOriginal %d\n",totalDeBucketsAtual,this->pl[indiceOriginal] );
+
+            for(int p = 0; p< totalDeBucketsAtual; p++){ 
+              //  printf("indiceAux eh %d, tem que ser maior que %d e diferente de %d\n", indiceAux,limit, idx );
+             if(indiceAux >=limit && idx != indiceAux){
+             // printf( "arquivos: %s e %s\n",(this->hash[indiceAux]).c_str(), (this->hash[indiceOriginal]).c_str());
+              if(this->hash[indiceAux] ==  diretorio+"bucket/"+to_string(indiceAux)+".txt"){
+             //    cout<<"ENTREI!!"<<endl;
+                    newBool = true;
+                    break;
+              }
+             }
+            indiceAux+=4;
+           }
+           
+
+          if(newBool == false){
+             indiceAux = funcaoHash(this->pgOriginal,idx);
+             this->pl[indiceOriginal] --;
+             plAux = this->pl[indiceOriginal];
+            int totalDeBuckets = pow(2,(this->pg - this->pgOriginal));
+            for(int p = 0; p< totalDeBuckets; p++){
+            //  indiceAux = funcaoHash(p,idx);
+                       
+            if(indiceAux!= aux2){
+             
+              this->pl[indiceAux] = plAux;   
+          //    cout<< endl<<"indicex: "<<indiceAux<<", pl:"<<this->pl[indiceAux]<<endl;      
+            }     
+            aux2 = indiceAux;
+            indiceAux+=4;
+          
+            }
+         
+          }  
+          }              
+        }
+           
+            aux = idx;
+          //  idx-=4;
+        }
+      }
+    }
+  }
+} 
+      if(total !=(pow(2,this->pg)-1)){
+        total=pow(2,this->pg)-1;
+        i = total;
+      }    
+      i--;
+    }
+  }  
 };
 
 #endif

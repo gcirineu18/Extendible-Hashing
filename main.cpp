@@ -9,11 +9,14 @@
 #include <math.h>
 #include <typeinfo>
 #include <sstream>
+
 using namespace std;
 
-int main(){
+int main(){  
+  
+
   HashExtensivel obj;
-  ifstream arq_in("D:/banco_tabalho1_sgbd/in.txt"); //abrindo arquivo in.txt
+  ifstream arq_in("D:/banco_tabalho1_sgbd/in.txt"); 
 
   if(!arq_in.is_open()){ 
     cout<<"Erro ao abrir arquivo!\n"<<endl;
@@ -25,7 +28,6 @@ int main(){
   getline(arq_in, prim_linha); 
   prim_linha.erase(0,3); 
   int pg = stoi(prim_linha); 
-
   obj.criaHash(pg); //criando a hash
   obj.Apagabuckets();
   
@@ -37,20 +39,12 @@ int main(){
   string ano_str;
   int ano; 
 
-  string filename="D:/banco_tabalho1_sgbd/out.txt";  //criando arquivo out.txt
-
-  ofstream arq_out(filename);
-  if (!arq_out.is_open()) {
-      cout << "Erro ao abrir arquivo de saída!" << endl;
-      return -1;
-  }
-  arq_out << "PG: "<< pg; //primeira linha do arquivo out.txt
 
   while(getline(arq_in, line1)){ 
    
     com = line1.substr(0,3);   
     if(com != "INC" && com !=  "REM" && com != "BUS"){
-      cout<<"Testando 4234"<<endl;
+      
       continue;
     }
     else{
@@ -69,9 +63,8 @@ int main(){
       }
     }
   }
-
   arq_in.close();
-  arq_out.close();
+
   return 0;
 
 }
