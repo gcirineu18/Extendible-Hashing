@@ -1,5 +1,4 @@
 #include "hashExtensivel.h"
-//#include "hash2.h"
 #include <string>
 #include <iostream>
 #include <vector>
